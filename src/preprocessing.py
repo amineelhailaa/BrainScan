@@ -55,38 +55,16 @@ def load_image(path):
     return padded_image
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-def load_batch(records, root=".", *, seed=SEED, limit=32):
-    records = list(records)
+def load_dataset(records, root="."):
+    """Load all image records in order, keeping images and labels paired."""
     root = Path(root)
-
-    if limit is not None and limit < 1:
-        raise ValueError("limit must be positive or None")
-
-    # Shuffle record positions, keeping each image paired with its label.
-    random_generator = np.random.default_rng(seed)
-    indices = random_generator.permutation(len(records))
-    if limit is not None:
-        indices = indices[:limit]
 
     images = []
     labels = []
     paths = []
     failures = []
 
-    for index in indices:
-        record = records[index]
+    for record in records:
         path = record["path"]
         label = CLASS_TO_INDEX[record["label"]]
 
@@ -96,19 +74,15 @@ def load_batch(records, root=".", *, seed=SEED, limit=32):
             failures.append({"path": path, "reason": str(error)})
             continue
 
-        # Add all three together only when the image loaded successfully.
         images.append(image)
         labels.append(label)
         paths.append(path)
 
     if len(images) > 0:
-        X = np.stack(images)
+        X = np.array(images)
     else:
         X = np.empty((0, 224, 224, 3), dtype=np.uint8)
     y = np.array(labels, dtype=np.int64)
 
-    assert len(X) == len(y) == len(paths)
-    assert X.shape == (len(y), 224, 224, 3)
-    assert np.isfinite(X).all()
-
     return X, y, paths, failures
+
