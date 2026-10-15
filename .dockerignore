@@ -1,0 +1,11 @@
+.git
+.idea
+.venv
+venv
+__pycache__
+*.py[cod]
+Data
+models
+reports
+.codex
+.aws
