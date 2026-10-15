@@ -1,0 +1,26 @@
+services:
+  jupyter:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.jupyter
+    ports:
+      - "127.0.0.1:8888:8888"
+    volumes:
+      - .:/workspace
+      - ./Data:/workspace/Data:ro
+    working_dir: /workspace
+    init: true
+    shm_size: 2gb
+    restart: unless-stopped
+
+  streamlit:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.streamlit
+    ports:
+      - "127.0.0.1:8501:8501"
+    volumes:
+      - ./Data:/workspace/Data:ro
+      - ./models:/workspace/models:ro
+    init: true
+    restart: unless-stopped
